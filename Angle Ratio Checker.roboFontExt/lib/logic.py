@@ -69,7 +69,7 @@ def get_angle_ratio(p, check_triangles, check_circles):
         r = rin / rout
     if r is not None:
         angle = math.atan2(apt.y-cpt.y,apt.x-cpt.x) + .5* math.pi
-        angle_degrees = math.degrees(angle)%180
+        angle_degrees = math.degrees(angle)
         
     return round(angle_degrees, 2), round(r, 2)
         
@@ -95,8 +95,8 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles, check_circles):
                         angle, ratio = get_angle_ratio(point_to_check, check_triangles, check_circles)
                     angles.append(angle)
                     ratios.append(ratio)
-                
-                average_angle  = average_list(angles)
+
+                average_angle  = average_list(angles)%180
                 average_ratio  = average_list(ratios)
                 angle_gamut    = max(angles) - min(angles)
                 ratio_gamut    = max(ratios) - min(ratios)

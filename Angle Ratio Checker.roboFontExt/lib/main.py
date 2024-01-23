@@ -100,7 +100,7 @@ class AngleRatioChecker(ezui.WindowController):
         >>> [X] Smooth Triangle Points         @triPointCheckbox
         >>> [X] Smooth Circle Points           @circPointCheckbox
 
-        >> (Scan)                              @scanButton
+        >> (Scan Points)                       @scanButton
 
         > ---
 
