@@ -6,7 +6,7 @@ from logic import scan_fonts
 from mojo.UI import AllGlyphWindows, getGlyphViewDisplaySettings, setGlyphViewDisplaySettings
 from mojo.extensions import getExtensionDefault, setExtensionDefault
 from mojo.events import postEvent
-from mojo.subscriber import Subscriber, registerGlyphEditorSubscriber, unregisterGlyphEditorSubscriber, registerSubscriberEvent
+from mojo.subscriber import Subscriber, registerGlyphEditorSubscriber, unregisterGlyphEditorSubscriber, registerSubscriberEvent, getRegisteredSubscriberEvents
 import weakref
 import merz
 
@@ -16,6 +16,9 @@ EVENT_KEY = EXTENSION_KEY_STUB + ".pointDidGetFlagged"
 
 
 class Highlighter(Subscriber):
+    
+    debug = True
+    controller = None
     
     tool_glyph_name = None
     contour_index   = None
@@ -34,15 +37,14 @@ class Highlighter(Subscriber):
         
     def glyphEditorDidSetGlyph(self, info):
         self.g = info['glyph']
-        if self.g.name != self.tool_glyph_name:
-            self.ge_container.clearSublayers()
-        else:
+        if self.g.name == self.tool_glyph_name:
             self.highlight_point(self.contour_index, self.point_index)
+        
+    glyphEditorGlyphDidChangeOutlineDelay = 0    
+    def glyphEditorGlyphDidChangeOutline(self, info):
+        self.highlight_point(self.contour_index, self.point_index)
             
-                
     def pointDidGetFlagged(self, info):
-        self.ge_container.clearSublayers()
-        # print("info", info)
         lle = info['lowLevelEvents'][0]
         self.tool_glyph_name, self.contour_index, self.point_index = lle['glyph_name'], lle['contour_index'], lle['point_index']
         self.getGlyphEditor().setGlyphByName(self.tool_glyph_name)
@@ -50,11 +52,12 @@ class Highlighter(Subscriber):
         self.highlight_point(self.contour_index, self.point_index)
             
     def highlight_point(self, contour_index, point_index):
+        self.ge_container.clearSublayers()
         if contour_index > len(self.g.contours) - 1:
-            print("Contour index out of range")
+            print("Angle Ratio Checker: Contour index out of range")
             return
         if point_index > len(self.g.contours[contour_index].points) - 1:
-            print("Point index out of range")
+            print("Angle Ratio Checker: Point index out of range")
             return
         point = self.g.contours[contour_index].points[point_index]
         highlight = self.ge_container.appendSymbolSublayer(
@@ -260,6 +263,7 @@ class AngleRatioChecker(ezui.WindowController):
             defaultButton='scanButton',
         )
         # Set up relationship with Subscriber in order to highlight points of interest
+        Highlighter.controller = self
         registerGlyphEditorSubscriber(Highlighter)
         # Reload previous settings
         self.settings_form = self.w.getItem("settingsForm")
@@ -277,6 +281,7 @@ class AngleRatioChecker(ezui.WindowController):
     def destroy(self):
         setExtensionDefault(EXTENSION_KEY_STUB + ".settings", self.settings_form.getItemValues())
         unregisterGlyphEditorSubscriber(Highlighter)
+        Highlighter.controller = None
         
     def reset_results(self):
         self.results_table.set({})
@@ -289,7 +294,6 @@ class AngleRatioChecker(ezui.WindowController):
         selected_g_name = sender.getSelectedItems()[0]['glyph_name']
         contour_index = sender.getSelectedItems()[0]['contour_index']
         point_index = sender.getSelectedItems()[0]['point_index']
-        print(selected_g_name)
         postEvent(EVENT_KEY, glyph_name=selected_g_name, contour_index=contour_index, point_index=point_index)
         
     def fontsTableCreateItemsForDroppedPathsCallback(self, sender, paths):
@@ -313,7 +317,8 @@ class AngleRatioChecker(ezui.WindowController):
     def addOpenFontsButtonCallback(self, sender):
         self.fonts = self.fonts_table.get()
         for font in AllFonts():
-            self.fonts.append(font)
+            if not font in self.fonts:
+                self.fonts.append(font)
         self.fonts_table.set(self.fonts)
         
     def addRemoveButtonAddCallback(self, sender):
@@ -335,11 +340,9 @@ class AngleRatioChecker(ezui.WindowController):
         triangles  = self.w.getItem("triPointCheckbox").get()
         circles    = self.w.getItem("circPointCheckbox").get()
         scanned_fonts = scan_fonts(self.fonts, angle_tol, ratio_tol, triangles, circles)
-        # print(scanned_fonts)
         # Sort the results with the worst quality rating first.
         scan_results_ordered = dict(sorted(scanned_fonts.items(), key=lambda item: item[1][0]))
-        ## Figure out how to group by glyph name after sorting quality.
-        # scan_results_ordered = dict(sorted(scan_results_ordered.items(), key=lambda item: item[0][0]))
+        ## Figure out how to group by glyph name after sorting quality?
         self.reset_results()
         for (g_name, contour_index, point_index), (quality_rating, angle_gamut, average_angle, ratio_gamut, average_ratio) in scan_results_ordered.items():
             table_item = {
@@ -361,14 +364,14 @@ class AngleRatioChecker(ezui.WindowController):
         
 
 if __name__ == "__main__":
-    registerSubscriberEvent(
-        subscriberEventName=EVENT_KEY,
-        methodName="pointDidGetFlagged",
-        lowLevelEventNames=[EVENT_KEY],
-        # eventInfoExtractionFunction=demoInfoExtractor,
-        dispatcher="roboFont",
-        delay=0,
-        debug=True
-    )
-
+    if EVENT_KEY not in getRegisteredSubscriberEvents():
+        registerSubscriberEvent(
+            subscriberEventName=EVENT_KEY,
+            methodName="pointDidGetFlagged",
+            lowLevelEventNames=[EVENT_KEY],
+            # eventInfoExtractionFunction=demoInfoExtractor,
+            dispatcher="roboFont",
+            delay=0,
+            debug=True
+        )
     AngleRatioChecker()
