@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>addToMenu</key>
+	<array>
+		<dict>
+			<key>path</key>
+			<string>main.py</string>
+			<key>preferredName</key>
+			<string>Angle Ratio Checker</string>
+			<key>shortKey</key>
+			<string></string>
+		</dict>
+	</array>
+	<key>developer</key>
+	<string>Ryan Bugden</string>
+	<key>developerURL</key>
+	<string>https://ryanbugden.com</string>
+	<key>html</key>
+	<false/>
+	<key>launchAtStartUp</key>
+	<false/>
+	<key>mainScript</key>
+	<string>main.py</string>
+	<key>name</key>
+	<string>Angle Ratio Checker</string>
+	<key>requiresVersionMajor</key>
+	<string>4</string>
+	<key>requiresVersionMinor</key>
+	<string>5b</string>
+	<key>timeStamp</key>
+	<real>1706039006.2551849</real>
+	<key>version</key>
+	<string>0.1</string>
+</dict>
+</plist>
