@@ -1,8 +1,8 @@
-# Angle Ratio Checker
+# Smooth Operator
 
 <img src="./images/mechanic_icon.png"  width="80">
 
-#### Angle Ratio Checker is a RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs.
+#### Smooth Operator is a RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs. It basically helps prevent kinks in your curves.
 
 <img src="./images/ui.png">
 

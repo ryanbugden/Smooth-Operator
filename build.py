@@ -3,7 +3,7 @@
 # -----------------
 
 name                = "Smooth Operator"
-version             = "0.1"
+version             = "1.0"
 developer           = "Ryan Bugden"
 developer_url       = "https://ryanbugden.com"
 rf_version          = "4.5b"
