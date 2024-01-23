@@ -64,7 +64,7 @@ requirements_path = os.path.join(base_path, "requirements.txt")
 resources_path = os.path.join(source_path, "resources")
 if not os.path.exists(resources_path):
     resources_path = None
-extension_file = "%s.roboFontExt" % name
+extension_file = "%s.roboFontExt" % name.replace(" ", "")
 build_path = base_path
 extension_path = os.path.join(build_path, extension_file)
 
