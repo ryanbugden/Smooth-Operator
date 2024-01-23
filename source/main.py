@@ -1,4 +1,4 @@
-# menuTitle: Angle Ratio Checker
+# menuTitle: Smooth Operator
 # author:    Ryan Bugden
 
 import ezui
@@ -11,7 +11,7 @@ import weakref
 import merz
 
 
-EXTENSION_KEY_STUB  = "com.ryanbugden.angleRatioChecker"
+EXTENSION_KEY_STUB  = "com.ryanbugden.smoothOperator"
 EVENT_KEY = EXTENSION_KEY_STUB + ".pointDidGetFlagged"
 
 
@@ -54,10 +54,10 @@ class Highlighter(Subscriber):
     def highlight_point(self, contour_index, point_index):
         self.ge_container.clearSublayers()
         if contour_index > len(self.g.contours) - 1:
-            print("Angle Ratio Checker: Contour index out of range")
+            print("Smooth Operator: Contour index out of range")
             return
         if point_index > len(self.g.contours[contour_index].points) - 1:
-            print("Angle Ratio Checker: Point index out of range")
+            print("Smooth Operator: Point index out of range")
             return
         point = self.g.contours[contour_index].points[point_index]
         highlight = self.ge_container.appendSymbolSublayer(
@@ -76,7 +76,7 @@ class Highlighter(Subscriber):
             )
                 
 
-class AngleRatioChecker(ezui.WindowController):
+class SmoothOperator(ezui.WindowController):
 
     def build(self):
         content = """
@@ -255,7 +255,7 @@ class AngleRatioChecker(ezui.WindowController):
         )
         self.w = ezui.EZWindow(
             content=content,
-            title="Angle Ratio Checker",
+            title="Smooth Operator",
             descriptionData=descriptionData,
             controller=self,
             size=(1120, 600),
@@ -374,4 +374,4 @@ if __name__ == "__main__":
             delay=0,
             debug=True
         )
-    AngleRatioChecker()
+    SmoothOperator()

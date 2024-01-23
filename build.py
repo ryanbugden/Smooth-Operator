@@ -2,7 +2,7 @@
 # Extension Details
 # -----------------
 
-name                = "Angle Ratio Checker"
+name                = "Smooth Operator"
 version             = "0.1"
 developer           = "Ryan Bugden"
 developer_url       = "https://ryanbugden.com"
@@ -11,7 +11,7 @@ pyc_only            = False
 menu_items          = [
                         dict(
                             path="main.py",
-                            preferredName="Angle Ratio Checker",
+                            preferredName="Smooth Operator",
                             shortKey=""
 
                         ),

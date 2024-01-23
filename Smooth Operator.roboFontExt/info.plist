@@ -8,7 +8,7 @@
 			<key>path</key>
 			<string>main.py</string>
 			<key>preferredName</key>
-			<string>Angle Ratio Checker</string>
+			<string>Smooth Operator</string>
 			<key>shortKey</key>
 			<string></string>
 		</dict>
@@ -24,13 +24,13 @@
 	<key>mainScript</key>
 	<string>main.py</string>
 	<key>name</key>
-	<string>Angle Ratio Checker</string>
+	<string>Smooth Operator</string>
 	<key>requiresVersionMajor</key>
 	<string>4</string>
 	<key>requiresVersionMinor</key>
 	<string>5b</string>
 	<key>timeStamp</key>
-	<real>1706049095.1745651</real>
+	<real>1706050963.462539</real>
 	<key>version</key>
 	<string>0.1</string>
 </dict>
