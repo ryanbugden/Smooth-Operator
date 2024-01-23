@@ -99,7 +99,7 @@ class SmoothOperator(ezui.WindowController):
         >>> : Tolerance:
         >>> [_1 _] Angle (°)                   @angleTolerance
         >>> [_0.3 _] Ratio                     @ratioTolerance
-        >>> : Check:
+        >>> : Scan:
         >>> [X] Smooth Triangle Points         @triPointCheckbox
         >>> [X] Smooth Circle Points           @circPointCheckbox
 
