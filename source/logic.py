@@ -109,16 +109,21 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles, check_circles):
         pen = RecordingPointPen() 
         base_g.drawPoints(pen) 
         point_info = reformat_pen_output(pen.value)
+        if not point_info:
+            continue
         for c_i, c in enumerate(point_info):
             for p_i, p in enumerate(c):
                 if get_angle_ratio(p, c, check_triangles, check_circles) == None:
                     continue
-                
                 angles, ratios = [], []
                 for f in fonts:
                     check_pen = RecordingPointPen() 
                     f[g_name].drawPoints(check_pen) 
                     check_point_info = reformat_pen_output(check_pen.value)
+                    if len(check_point_info) < c_i + 1:
+                        continue
+                    if len(check_point_info[c_i]) < p_i + 1:
+                        continue
                     point_to_check = check_point_info[c_i][p_i]
                     if get_angle_ratio(point_to_check, check_point_info[c_i], check_triangles, check_circles) == None:
                         angle, ratio = 0, 0  # What should the failed value be?
@@ -132,7 +137,7 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles, check_circles):
                 angle_gamut    = get_angle_gamut(min(angles), max(angles))
                 ratio_gamut    = max(ratios) - min(ratios)
                 quality_rating = calculate_quality_score(angle_gamut, ratio_gamut, angle_tol, ratio_tol)
-            
+
                 all_info[(g_name, c_i, p_i)] = (quality_rating, angle_gamut, average_angle, ratio_gamut, average_ratio)    
 
     return all_info

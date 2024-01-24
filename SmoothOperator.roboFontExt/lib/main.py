@@ -357,9 +357,12 @@ class SmoothOperator(ezui.WindowController):
                     }
             if quality_rating != 100:
                 self.results_table.appendItems([table_item])
-        if self.results_table.get():
+        result_count = len(self.results_table.get())
+        if result_count > 0:
             self.result_count.set(f"{len(self.results_table.get())} results")
-            self.result_count.show(True)
+        else:
+            self.result_count.set("Looking smooth!")
+        self.result_count.show(True)
         
         
 
