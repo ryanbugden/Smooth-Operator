@@ -1,6 +1,6 @@
 # Smooth Operator
 
-<img src="./images/mechanic_icon.png"  width="80">
+  
 
 #### Smooth Operator is a RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs. It basically helps prevent kinks in your curves. 
 
@@ -30,5 +30,9 @@ Choose the type of points you'd like to evaluate. Only points with a `smooth` fl
 ### Results
 This is the output of the tool, allowing you to see which specific points might cause issues in your interpolation. When you click on a row, all open glyph windows will not only go to the that glyph, but also mark the problem point with a red star.
 
+<img src="./images/glyphview.png" width=400px>
+
 ##### Indexes
 Using these buttons, you can globally control the display settings of all open glyph windows, either showing or hiding all labels for contour or point indexes. This is useful if you don’t want to click each row, and instead want to just manually go through points yourself. 
+
+
