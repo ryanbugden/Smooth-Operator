@@ -28,7 +28,7 @@ When looking at individual points across all UFOs, if the difference in angles o
 Choose the type of points you'd like to evaluate. Only points with a `smooth` flagged will be checked. Triangle points are smooth points with only one off-curve. Circle points are smooth points with two off-curves.
 
 ### Results
-This is the output of the tool, allowing you to see which specific points might cause issues in your interpolation. When you click on a row, all open glyph windows will not only go to the that glyph, but also mark the problem point with a red star.
+This is the output of the tool, allowing you to see which specific points might cause issues in your interpolation. When you click on a row, all open glyph windows will not only go to the that glyph, but also mark the problem point with a **red star** (see below).
 
 <img src="./images/glyphview.png" width=400px>
 
