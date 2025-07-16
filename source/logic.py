@@ -18,19 +18,49 @@ Ryan Bugden
 def average_list(lst):
     return sum(lst) / len(lst) 
     
-def get_angle_gamut(angle_1, angle_2):
+
+def calc_angle_gamut(angle_1, angle_2):
     gamut = abs(angle_2 - angle_1)
     if gamut > 180:
         gamut = 360 - gamut
     return gamut
     
-def calculate_quality_score(angle_gamut, ratio_gamut, angle_tol, ratio_tol):
+
+def calc_quality_score(angle_gamut, ratio_gamut, angle_tol, ratio_tol):
     # Calculate the quality score
     if angle_gamut < angle_tol or ratio_gamut < ratio_tol:
         quality_score = 100
     else:
         quality_score = (-angle_tol * 10 * angle_gamut) + (-ratio_tol * 10 * ratio_gamut) + 100
     return quality_score
+
+
+def calc_vector(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return x2 - x1, y2 - y1
+
+
+def calc_angle(p1, p2):
+    dx, dy = calc_vector(p1, p2)
+    return math.atan2(dy, dx)
+    
+    
+def calc_ratio(p1, p2, p3):
+    rin  = math.hypot(p1[0] - p2[0], p1[1] - p2[1])
+    rout = math.hypot(p3[0] - p2[0], p3[1] - p2[1])
+    return rin / rout
+
+
+def collinear(p1, p2, p3, error_in_degrees=1):
+    '''Find if three points are collinear. From Frank Griesshammer.'''
+    angle_1 = calc_angle(p1, p2)
+    angle_2 = calc_angle(p2, p3)
+
+    if abs(angle_2 - angle_1) < math.radians(error_in_degrees):
+        return True
+    return False
+
     
 def reformat_pen_output(pen_value):
     main_list = []
@@ -50,7 +80,8 @@ def reformat_pen_output(pen_value):
         p_i += 1
     return main_list
     
-def get_angle_ratio(p, contour_point_info, check_triangles, check_circles):
+    
+def get_angle_ratio(p, contour_point_info, check_triangles, check_circles, check_non_smooth):
     i = p[0][1]
     c = contour_point_info
     l = len(contour_point_info)
@@ -61,8 +92,12 @@ def get_angle_ratio(p, contour_point_info, check_triangles, check_circles):
 
     apt = bpt = cpt = r = rin = rout = None
     
+    # Try to suss out non-smooth-flag points
+    if check_non_smooth == True and p[1][1]=="curve":
+        if collinear(ppt[1][0], p[1][0], npt[1][0]) == False:
+            return
     # Only care about smooth points
-    if p[1][2] != True:
+    elif p[1][2] != True:
         return
     # Only care about ⏺ points
     if check_circles == False and npt[1][1]==None and ppt[1][1]==None:
@@ -89,20 +124,21 @@ def get_angle_ratio(p, contour_point_info, check_triangles, check_circles):
         cpt = npt
 
     if apt is not None and bpt is not None and cpt is not None:
-        rin = math.hypot(apt[1][0][0]-bpt[1][0][0],apt[1][0][1]-bpt[1][0][1])
-        rout = math.hypot(cpt[1][0][0]-bpt[1][0][0],cpt[1][0][1]-bpt[1][0][1])
-        r = rin / rout
+        r = calc_ratio(apt[1][0], bpt[1][0], cpt[1][0])
     if r is not None:
-        angle = math.atan2(apt[1][0][1]-cpt[1][0][1],apt[1][0][0]-cpt[1][0][0]) + .5* math.pi
+        angle_1 = calc_angle(apt[1][0], bpt[1][0])
+        angle_2 = calc_angle(bpt[1][0], cpt[1][0])
+        angle = (angle_1 + angle_2) / 2  # math.atan2(apt[1][0][1] - cpt[1][0][1], apt[1][0][0] - cpt[1][0][0]) + .5 * math.pi
         angle_degrees = math.degrees(angle)
         
     return round(angle_degrees, 2), round(r, 2)
         
         
-def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles, check_circles):
+def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles=True, check_circles=True, check_non_smooth=False):
     base_f = fonts[0]
     all_info = {}
     for g_name in base_f.glyphOrder:
+        print(g_name)
         base_g = fonts[0][g_name]
         if not base_g.contours: continue
         all_point_info = []
@@ -113,7 +149,7 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles, check_circles):
             continue
         for c_i, c in enumerate(point_info):
             for p_i, p in enumerate(c):
-                if get_angle_ratio(p, c, check_triangles, check_circles) == None:
+                if get_angle_ratio(p, c, check_triangles, check_circles, check_non_smooth) == None:
                     continue
                 angles, ratios = [], []
                 for f in fonts:
@@ -125,18 +161,18 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles, check_circles):
                     if len(check_point_info[c_i]) < p_i + 1:
                         continue
                     point_to_check = check_point_info[c_i][p_i]
-                    if get_angle_ratio(point_to_check, check_point_info[c_i], check_triangles, check_circles) == None:
+                    if get_angle_ratio(point_to_check, check_point_info[c_i], check_triangles, check_circles, check_non_smooth) == None:
                         angle, ratio = 0, 0  # What should the failed value be?
                     else:
-                        angle, ratio = get_angle_ratio(point_to_check, check_point_info[c_i], check_triangles, check_circles)
+                        angle, ratio = get_angle_ratio(point_to_check, check_point_info[c_i], check_triangles, check_circles, check_non_smooth)
                     angles.append(angle)
                     ratios.append(ratio)
 
                 average_angle  = average_list(angles)%180
                 average_ratio  = average_list(ratios)
-                angle_gamut    = get_angle_gamut(min(angles), max(angles))
+                angle_gamut    = calc_angle_gamut(min(angles), max(angles))
                 ratio_gamut    = max(ratios) - min(ratios)
-                quality_rating = calculate_quality_score(angle_gamut, ratio_gamut, angle_tol, ratio_tol)
+                quality_rating = calc_quality_score(angle_gamut, ratio_gamut, angle_tol, ratio_tol)
 
                 all_info[(g_name, c_i, p_i)] = (quality_rating, angle_gamut, average_angle, ratio_gamut, average_ratio)    
 

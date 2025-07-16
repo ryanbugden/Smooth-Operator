@@ -102,6 +102,7 @@ class SmoothOperator(ezui.WindowController):
         >>> : Scan:
         >>> [X] Smooth Triangle Points         @triPointCheckbox
         >>> [X] Smooth Circle Points           @circPointCheckbox
+        >>> [X] Almost-Smooth Points           @almostSmoothCheckbox
 
         >> (Scan Points)                       @scanButton
 
@@ -339,7 +340,12 @@ class SmoothOperator(ezui.WindowController):
         ratio_tol  = self.w.getItem("ratioTolerance").get()
         triangles  = self.w.getItem("triPointCheckbox").get()
         circles    = self.w.getItem("circPointCheckbox").get()
-        scanned_fonts = scan_fonts(self.fonts, angle_tol, ratio_tol, triangles, circles)
+        non_smooth = self.w.getItem("almostSmoothCheckbox").get()
+        if len(self.fonts) == 0:
+            self.result_count.set("Please add some fonts to scan.")
+            self.result_count.show(True)
+            return
+        scanned_fonts = scan_fonts(self.fonts, angle_tol, ratio_tol, triangles, circles, non_smooth)
         # Sort the results with the worst quality rating first.
         scan_results_ordered = dict(sorted(scanned_fonts.items(), key=lambda item: item[1][0]))
         ## Figure out how to group by glyph name after sorting quality?
