@@ -8,6 +8,7 @@ from mojo.events import postEvent
 from mojo.subscriber import Subscriber, registerGlyphEditorSubscriber, unregisterGlyphEditorSubscriber, registerSubscriberEvent, getRegisteredSubscriberEvents
 import weakref
 import merz
+import synchronizer
 from importlib import reload
 import logic
 reload(logic)
@@ -131,6 +132,8 @@ class SmoothOperator(ezui.WindowController):
         >>> Indexes:                           @indexesLabel
         >>> (Show All)                         @showIndexesButton
         >>> (Hide All)                         @hideIndexesButton
+        >>> ---                                @separator
+        >>> (Synchronizer)                     @synchronizerButton
         """
         results_table_items = []
         settings_title_width = 100
@@ -255,6 +258,12 @@ class SmoothOperator(ezui.WindowController):
                     ),
                 ]
                 ),
+                synchronizerButton=dict(
+                    gravity='trailing'
+                ),
+                separator=dict(
+                    gravity='trailing'
+                ),
                 indexesLabel=dict(
                     gravity='trailing'
                 ),
@@ -296,6 +305,9 @@ class SmoothOperator(ezui.WindowController):
         setExtensionDefault(EXTENSION_KEY_STUB + ".settings", self.settings_form.getItemValues())
         unregisterGlyphEditorSubscriber(Highlighter)
         Highlighter.controller = None
+        
+    def synchronizerButtonCallback(self, sender):
+        synchronizer.SmoothSynchronizer()
         
     def reset_results(self):
         self.results_table.set({})
