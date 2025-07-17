@@ -2,13 +2,16 @@
 # author:    Ryan Bugden
 
 import ezui
-from logic import scan_fonts
 from mojo.UI import AllGlyphWindows, getGlyphViewDisplaySettings, setGlyphViewDisplaySettings
 from mojo.extensions import getExtensionDefault, setExtensionDefault
 from mojo.events import postEvent
 from mojo.subscriber import Subscriber, registerGlyphEditorSubscriber, unregisterGlyphEditorSubscriber, registerSubscriberEvent, getRegisteredSubscriberEvents
 import weakref
 import merz
+import synchronizer
+from importlib import reload
+import logic
+reload(logic)
 
 
 EXTENSION_KEY_STUB  = "com.ryanbugden.smoothOperator"
@@ -38,21 +41,31 @@ class Highlighter(Subscriber):
     def glyphEditorDidSetGlyph(self, info):
         self.g = info['glyph']
         if self.g.name == self.tool_glyph_name:
-            self.highlight_point(self.contour_index, self.point_index)
+            if self.contour_index and self.point_index:
+                self.highlight_point(self.contour_index, self.point_index)
         
     glyphEditorGlyphDidChangeOutlineDelay = 0    
     def glyphEditorGlyphDidChangeOutline(self, info):
-        self.highlight_point(self.contour_index, self.point_index)
+        if self.contour_index and self.point_index:
+            self.highlight_point(self.contour_index, self.point_index)
             
     def pointDidGetFlagged(self, info):
         lle = info['lowLevelEvents'][0]
         self.tool_glyph_name, self.contour_index, self.point_index = lle['glyph_name'], lle['contour_index'], lle['point_index']
-        self.getGlyphEditor().setGlyphByName(self.tool_glyph_name)
+        glyph_editor = self.getGlyphEditor()
+        glyph_editor.setGlyphByName(self.tool_glyph_name)
+        glyph_editor.editGlyphView.zoomFitInWindow()
         self.g = RGlyph(self.getGlyphEditor().getGlyph())
         self.highlight_point(self.contour_index, self.point_index)
             
     def highlight_point(self, contour_index, point_index):
         self.ge_container.clearSublayers()
+        if contour_index == None:
+            print("Smooth Operator: No contour index provided.")
+            return
+        if self.g.contours == ():
+            print("Smooth Operator: No contours.")
+            return
         if contour_index > len(self.g.contours) - 1:
             print("Smooth Operator: Contour index out of range")
             return
@@ -119,6 +132,8 @@ class SmoothOperator(ezui.WindowController):
         >>> Indexes:                           @indexesLabel
         >>> (Show All)                         @showIndexesButton
         >>> (Hide All)                         @hideIndexesButton
+        >>> ---                                @separator
+        >>> (Synchronizer)                     @synchronizerButton
         """
         results_table_items = []
         settings_title_width = 100
@@ -150,6 +165,7 @@ class SmoothOperator(ezui.WindowController):
                 acceptedDropFileTypes=[".ufo"],
                 allowsDropBetweenRows=True,
                 allowsInternalDropReordering=True,
+                enableDelete=True,
                 width='fill',
                 height='fill',
                 columnDescriptions=[
@@ -242,6 +258,12 @@ class SmoothOperator(ezui.WindowController):
                     ),
                 ]
                 ),
+                synchronizerButton=dict(
+                    gravity='trailing'
+                ),
+                separator=dict(
+                    gravity='trailing'
+                ),
                 indexesLabel=dict(
                     gravity='trailing'
                 ),
@@ -283,6 +305,9 @@ class SmoothOperator(ezui.WindowController):
         setExtensionDefault(EXTENSION_KEY_STUB + ".settings", self.settings_form.getItemValues())
         unregisterGlyphEditorSubscriber(Highlighter)
         Highlighter.controller = None
+        
+    def synchronizerButtonCallback(self, sender):
+        synchronizer.SmoothSynchronizer()
         
     def reset_results(self):
         self.results_table.set({})
@@ -334,6 +359,12 @@ class SmoothOperator(ezui.WindowController):
             del self.fonts[index]
         self.fonts_table.set(self.fonts)
         
+    def fontsTableDeleteCallback(self, sender):
+        self.fonts = self.fonts_table.get()
+        for index in reversed(self.fonts_table.getSelectedIndexes()):
+            del self.fonts[index]
+        self.fonts_table.set(self.fonts)
+        
     def scanButtonCallback(self, sender):
         self.fonts = self.fonts_table.get()
         angle_tol  = self.w.getItem("angleTolerance").get()
@@ -341,11 +372,11 @@ class SmoothOperator(ezui.WindowController):
         triangles  = self.w.getItem("triPointCheckbox").get()
         circles    = self.w.getItem("circPointCheckbox").get()
         non_smooth = self.w.getItem("almostSmoothCheckbox").get()
-        if len(self.fonts) == 0:
-            self.result_count.set("Please add some fonts to scan.")
+        if len(self.fonts) < 2:
+            self.result_count.set("Please add more than one UFO to scan.")
             self.result_count.show(True)
             return
-        scanned_fonts = scan_fonts(self.fonts, angle_tol, ratio_tol, triangles, circles, non_smooth)
+        scanned_fonts = logic.scan_fonts(self.fonts, angle_tol, ratio_tol, triangles, circles, non_smooth)
         # Sort the results with the worst quality rating first.
         scan_results_ordered = dict(sorted(scanned_fonts.items(), key=lambda item: item[1][0]))
         ## Figure out how to group by glyph name after sorting quality?
@@ -365,7 +396,8 @@ class SmoothOperator(ezui.WindowController):
                 self.results_table.appendItems([table_item])
         result_count = len(self.results_table.get())
         if result_count > 0:
-            self.result_count.set(f"{len(self.results_table.get())} results")
+            plural = "" if result_count == 1 else "s"
+            self.result_count.set(f"{len(self.results_table.get())} result{plural}")
         else:
             self.result_count.set("Looking smooth!")
         self.result_count.show(True)
