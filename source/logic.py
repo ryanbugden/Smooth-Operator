@@ -103,22 +103,22 @@ def get_angle_ratio(p, contour_point_info, check_triangles, check_circles, check
     # Try to suss out non-smooth-flag points
     if check_non_smooth == True and p[1][1] == "curve":
         if collinear(ppt[1][0], p[1][0], npt[1][0]) == False:
-            print()
-            print("flag 1, NOT COLLINEAR, checking non-smooth")
-            print(p)
-            print(p[1])
+            # print()
+            # print("flag 1, NOT COLLINEAR, checking non-smooth")
+            # print(p)
+            # print(p[1])
             return
     # Only care about smooth points
     elif p[1][2] != True:
-        print("flag 2")
+        # print("flag 2")
         return
     # Only care about ⏺ points
     if check_circles == False and npt[1][1]==None and ppt[1][1]==None:
-        print("flag 3")
+        # print("flag 3")
         return
     # Only care about ▲ points
     if check_triangles == False and [npt[1][1], ppt[1][1]].count(None) == 1:
-        print("flag 4")
+        # print("flag 4")
         return
     
     if ppt[1][1]==None and p[1][1]=="curve" and npt[1][1]==None:
@@ -156,8 +156,8 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles=True, check_circles=
     for g_name in base_f.glyphOrder:
         # Debug with some glyphs
         debug = False
-        if g_name in ["a"]:
-            debug = True
+        # if g_name in ["a"]:
+        #     debug = True
         base_g = fonts[0][g_name]
         if not base_g.contours: continue
         all_point_info = []
@@ -166,8 +166,6 @@ def scan_fonts(fonts, angle_tol, ratio_tol, check_triangles=True, check_circles=
         point_info = reformat_pen_output(pen.value)
         if not point_info and debug:
             print(f"NO POINT INFO {g_name}")
-            print("pen.value", pen.value)
-            print("point_info", point_info)
             continue
         for c_i, c in enumerate(point_info):
             for p_i, p in enumerate(c):
