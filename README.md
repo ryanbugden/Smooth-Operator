@@ -4,7 +4,7 @@
 
 #### Smooth Operator is a RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs. It basically helps prevent kinks in your curves. 
 
-#### It was written on top of code from [Angle Ratio Tool](https://github.com/LettError/angleRatioTool) by Letterror/Erik van Blokland, and it is intended for use in conjunction with Angle Ratio Tool.
+#### It was written on top of code from [Angle Ratio Tool](https://github.com/LettError/angleRatioTool) by LettError/Erik van Blokland, and it is intended for use in conjunction with Angle Ratio Tool.
 
 <img src="./images/ui.png">
 
@@ -34,5 +34,13 @@ This is the output of the tool, allowing you to see which specific points might 
 
 ##### Indexes
 Using these buttons, you can globally control the display settings of all open glyph windows, either showing or hiding all labels for contour or point indexes. This is useful if you don’t want to click each row, and instead want to just manually go through points yourself. 
+
+### Synchronizer
+
+The Synchronizer is a little window that helps you automatically sync the ratios of all open fonts in any given glyph, one glyph at a time, using selected points. You may choose what you’re more comfortable changing between on-curves and off-curves. 
+
+Also, you may choose to match everything to the selected glyph or an average between all. For example, if you have 4 `S`s open (from 4 separate UFOs), with one point in one `S` selected, you can change the other 3 to adhere to your current S, or you can make all 4 compromise toward an average. If this is confusing, email me!
+
+<img src="./images/synchronizer.png" width=400px>
 
 
