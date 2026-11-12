@@ -1,12 +1,9 @@
+<img src="source/resources/mechanic_icon.png"  width="80">
 # Smooth Operator
 
-  
+A RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs. It basically helps prevent kinks in your curves. Smooth Operator was written on top of code from [Angle Ratio Tool](https://github.com/LettError/angleRatioTool) by LettError/Erik van Blokland, and it is intended for use in conjunction with Angle Ratio Tool.
 
-#### Smooth Operator is a RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs. It basically helps prevent kinks in your curves. 
-
-#### It was written on top of code from [Angle Ratio Tool](https://github.com/LettError/angleRatioTool) by LettError/Erik van Blokland, and it is intended for use in conjunction with Angle Ratio Tool.
-
-<img src="./images/ui.png">
+<img src="source/resources/ui.png">
 
 ## Sample workflow:
 1. Get your type family to a place where it is actually interpolable/"Prepolated" (same start points, contour order, contour direction, etc.)
@@ -30,7 +27,7 @@ Choose the type of points you'd like to evaluate. Only points with a `smooth` fl
 ### Results
 This is the output of the tool, allowing you to see which specific points might cause issues in your interpolation. When you click on a row, all open glyph windows will not only go to the that glyph, but also mark the problem point with a **red star** (see below).
 
-<img src="./images/glyphview.png" width=400px>
+<img src="source/resources/glyphview.png" width="400">
 
 ##### Indexes
 Using these buttons, you can globally control the display settings of all open glyph windows, either showing or hiding all labels for contour or point indexes. This is useful if you don’t want to click each row, and instead want to just manually go through points yourself. 
@@ -41,6 +38,5 @@ The Synchronizer is a little window that helps you automatically sync the ratios
 
 Also, you may choose to match everything to the selected glyph or an average between all. For example, if you have 4 `S`s open (from 4 separate UFOs), with one point in one `S` selected, you can change the other 3 to adhere to your current S, or you can make all 4 compromise toward an average. If this is confusing, email me!
 
-<img src="./images/synchronizer.png" width=400px>
-
+<img src="source/resources/synchronizer.png" width="400">
 

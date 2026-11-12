@@ -1,0 +1,14 @@
+name: Smooth Operator
+developer: Ryan Bugden
+developerURL: http://ryanbugden.com
+launchAtStartUp: false
+mainScript: main.py
+version: 1.2
+addToMenu:
+- path: main.py
+  preferredName: Smooth Operator
+  shortKey: ""
+html: true
+timeStamp: 1794519690
+requiresVersionMajor: '4'
+requiresVersionMinor: '5'
