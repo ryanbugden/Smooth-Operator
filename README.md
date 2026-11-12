@@ -1,4 +1,5 @@
 <img src="source/resources/mechanic_icon.png"  width="80">
+
 # Smooth Operator
 
 A RoboFont extension for diagnosing all angle/ratio discrepancies between interpolable UFOs. It basically helps prevent kinks in your curves. Smooth Operator was written on top of code from [Angle Ratio Tool](https://github.com/LettError/angleRatioTool) by LettError/Erik van Blokland, and it is intended for use in conjunction with Angle Ratio Tool.
