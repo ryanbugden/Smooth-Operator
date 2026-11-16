@@ -15,6 +15,7 @@ from mojo.subscriber import (
     registerSubscriberEvent,
     getRegisteredSubscriberEvents,
 )
+from mojo.roboFont import OpenWindow
 import synchronizer
 from importlib import reload
 import logic
@@ -295,7 +296,7 @@ class SmoothOperator(ezui.WindowController):
         Highlighter.controller = None
 
     def synchronizerButtonCallback(self, sender):
-        synchronizer.SmoothSynchronizer()
+        OpenWindow(synchronizer.Synchronizer)
 
     def reset_results(self):
         self.results_table.set({})

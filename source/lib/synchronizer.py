@@ -3,7 +3,7 @@
 
 import ezui
 import math
-from mojo.roboFont import CurrentGlyph, AllFonts
+from mojo.roboFont import CurrentGlyph, AllFonts, OpenWindow
 from mojo.UI import getDefault
 
 
@@ -47,6 +47,9 @@ def change_ratio(pt, new_ratio, off_curve_change=0.1):
     in_factor = -new_ratio  # Based on 2 and 3
     out_factor = (new_ratio + 1) / new_ratio  # Based on 1 and 2
     off_pt_amount = len([pt for pt in [prev_pt, next_pt] if pt.type == "offcurve"])
+    if off_pt_amount == 0:
+        print("Synchronizer: Invalid")
+        return
     off_soften = (
         off_curve_change / off_pt_amount
     )  # Amount each off-curve point move shares the load
@@ -93,11 +96,15 @@ def get_all_corresponding_pts(pt):
     c_i = pt.contour.index
     all_pts = {pt}
     for f in AllFonts():
-        other_pt = f[g_name].contours[c_i].points[pt.index]
+        other_contour = f[g_name].contours[c_i]
+        if pt.index + 1 > len(other_contour.points):
+            print("Synchronizer: Different point count")
+            return
+        other_pt = other_contour.points[pt.index]
         if other_pt.type == pt.type and check_same_pt_flavor(pt, other_pt):
             all_pts.add(other_pt)
         else:
-            print(f"Check point relevance in {f.info.styleName} {g_name}.")
+            print(f"Synchronizer: Check point relevance in {f.info.styleName} {g_name}.")
     return all_pts
 
 
@@ -110,6 +117,9 @@ def get_average_ratios(pts):
 def sync_ratios(pt, mode="follow", off_curve_change=0.1):
     """Syncs ratios of all corresponding pts of a point."""
     pts = get_all_corresponding_pts(pt)
+    if pts is None:
+        print("Synchronizer: Cannot sync ratios")
+        return
     if mode == "follow":
         desired_ratio = calc_ratio(pt)
     elif mode == "average":
@@ -120,7 +130,7 @@ def sync_ratios(pt, mode="follow", off_curve_change=0.1):
         change_ratio(pt, desired_ratio, off_curve_change=off_curve_change)
 
 
-class SmoothSynchronizer(ezui.WindowController):
+class Synchronizer(ezui.WindowController):
     def build(self):
         content = """
         Change:
@@ -175,6 +185,10 @@ class SmoothSynchronizer(ezui.WindowController):
     def save_state(self, ref_pts):
         this_state = {}
         for p in ref_pts:
+            corr_pts = get_all_corresponding_pts(p)
+            if corr_pts is None:
+                print("Synchronizer: Cannot find corresponding points")
+                return
             for corr_pt in list(get_all_corresponding_pts(p)):
                 for pt in list(get_surrounding_points(corr_pt)) + [corr_pt]:
                     this_state.update({pt: (pt.x, pt.y)})
@@ -202,3 +216,7 @@ class SmoothSynchronizer(ezui.WindowController):
         self.saved_states.pop()
         if not self.saved_states:
             self.clear_saved_states()
+
+
+if __name__ == "__main__":
+    OpenWindow(Synchronizer)
